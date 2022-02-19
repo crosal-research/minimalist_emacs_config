@@ -1,0 +1,176 @@
+#+title: My config file
+#+author: Joao Rosal
+#+date: 19/02/2022
+#+startup: overview
+
+* Basic settings
+
+  #+begin_src emacs-lisp :results silent
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (prefer-coding-system 'utf-8)
+    (setq inhibit-splash-screen 1)
+
+    ;;visual  improvements
+    (set-face-attribute 'default nil :font "Droid Sans Mono-14" :width 'expanded)
+
+    ;; basic shortkeys
+    (fset 'yes-or-no-p 'y-or-n-p)
+    (global-set-key (kbd "C-x C-j") 'dired-jump)
+    (add-hook 'dired-mode-hook 
+	      ((lambda ()(load "dired-x")))) ;; adds some nicities to dired
+
+    ;;parenthesis
+    (electric-pair-mode)
+    (show-paren-mode)
+    (setq show-paren-style 'parenthesis)
+
+  #+end_src
+
+
+* Yasnippet
+
+ #+begin_src  emacs-lisp  :results silent
+   (use-package yasnippet
+     :ensure t
+     :config (use-package   yasnippet-snippets
+	       :ensure  t)
+     (yas-reload-all)
+     (add-hook 'org-mode-hook #'yas-minor-mode)
+     (add-hook 'elisp-mode-hook #'yas-minor-mode)
+     (add-hook 'org-mode-hook #'yas-minor-mode)
+     (add-hook 'python-mode #'yas-minor-mode))
+ #+end_src
+
+
+
+  
+
+ 
+* Babel
+
+  #+begin_src emacs-lisp :results silent
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (shell . t)))
+  #+end_src
+
+  
+* Which-key
+  #+begin_src emacs-lisp :results silent
+    (use-package which-key
+      :ensure t
+      :init (which-key-mode)
+      :diminish whick-key-mode
+      :config (setq which-key-idle-delay 0.3))
+  #+end_src
+
+
+
+
+  
+* Dublicate thing
+  #+begin_src emacs-lisp :results silent
+    (use-package duplicate-thing
+      :ensure t
+      :bind ("M-c" . duplicate-thing))
+
+
+  #+end_src
+
+  
+* swiper, counsel and ivy
+  - Installing counsel both swiper and ivy are
+    installed automatically
+
+  #+begin_src emacs-lisp :results silent
+    (use-package counsel
+      :ensure t
+      :config (setq  ivy-use-virtual-buffers  t
+		     ivy-count-format "%d/%d ")
+      :bind (("M-x" . counsel-M-x)
+	     ("C-x C-f" . counsel-find-file)
+	     ("C-h f". counsel-describe-function)
+	     ("C-h v". counsel-describe-variable)
+	     ("C-s" . swiper-isearch)
+	     ("C-x b" . ivy-switch-buffer)
+	     ("M-y". counsel-yank-pop)))
+  #+end_src
+
+
+* Projectile
+  #+begin_src emacs-lisp :results silent
+    (use-package projectile
+      :ensure t
+      :init (use-package counsel-projectile
+	      :ensure  t)
+	    (counsel-projectile-mode)
+      :bind-keymap ("C-c p" . projectile-command-map)
+      :config (setq projectile-completion-system 'ivy))
+  #+end_src
+
+  
+* aspell and spellchicking
+
+  #+begin_src emacs-lisp :results silent
+    (setq-default ispell-program-name
+		  "/data/data/com.termux/files/usr/bin/aspell")
+    (setq ispell-current-dictionary "en")
+
+    ;; change dctionary using ivy
+    (defun change-dictionary (x)
+      ;; (setq ispell-current-dictionary x)
+      (setq ispell-current-idcttionary (cdr x))
+      (message "New dictionary:  %s" (cdr x)))
+
+
+    (defun jr/choose-dictionary ()
+      (interactive)
+      (ivy-read "dictionaries: " '(("e". "en") ("p" . "pt_br"))
+		:action '( 1 ("" change-dictionary))))
+
+    (global-set-key (kbd "C-c d") 'jr/choose-dictionary)
+
+
+    (global-set-key (kbd "C-c i") 'ispell-word)
+    (dolist (hook '(text-mode-hook org-mode-hook latex-mode-hook))
+		  (add-hook hook (lambda ()(flyspell-mode t))))
+  #+end_src
+
+  
+* Magit
+
+  #+begin_src emacs-lisp :results silent
+    (use-package magit
+      :ensure t)
+  #+end_src
+
+
+* Theme
+  - theme may be changed if the user so desire
+  #+begin_src emacs-lisp :results silent
+    (use-package  cyberpunk-theme
+      :ensure t
+      :init (load-theme 'cyberpunk t))
+
+    (set-face-attribute 'default nil :height 180)
+
+  #+end_src
+
+  
+* iedit
+  #+begin_src emacs-lisp :results silent
+    (use-package iedit
+      :ensure t
+      :bind ("C-:" . iedit-mode))
+  #+end_src
+
+  
+* line numbering
+  #+begin_src emacs-lisp :results silent
+    (add-hook 'prog-mode (lambda ()
+			   (display-line-numbers-mode 1)))
+		       
+  #+end_src
+  
